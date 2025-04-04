@@ -19,7 +19,7 @@ const Login = () => {
       const user = res.data.user;
 
       // ✅ Store user info in localStorage
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       localStorage.setItem("userId", user._id);       // for backend auth
       localStorage.setItem("username", user.username); // optional: for navbar
 

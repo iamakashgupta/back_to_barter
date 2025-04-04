@@ -24,7 +24,7 @@ const Market = () => {
   const handleClaim = async (productId) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const userId = user?._id;
+      const userId = user ? user._id : null;
   
       if (!userId) {
         alert("Please login to claim items.");
@@ -32,15 +32,13 @@ const Market = () => {
         return;
       }
   
-      const res = await axios.post(`http://localhost:5000/api/items/claim/${productId}`, {
-        userId
-      });
+      const res = await axios.put(`http://localhost:5000/api/items/claim/${productId}`, { userId });
   
       alert("Claimed successfully! ✅");
-      fetchProducts();
+      fetchProducts(); // Refresh the list
     } catch (err) {
       console.error("Error claiming item:", err.response?.data || err.message);
-      alert("Failed to claim item ❌");
+      alert(`Failed to claim item ❌: ${err.response?.data?.message || 'Unknown error'}`);
     }
   };
   
