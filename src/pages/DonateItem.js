@@ -15,11 +15,32 @@ const DonateItem = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Submit to backend
-    alert("Item donated (functionality not yet connected)");
+  
+    try {
+      const res = await fetch("http://localhost:5000/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        alert("Item donated successfully!");
+        setFormData({ title: "", description: "", weight: "", image: "" });
+      } else {
+        alert("Something went wrong: " + data.message);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Failed to donate item. Check console.");
+    }
   };
+  
 
   return (
     <div style={styles.container}>

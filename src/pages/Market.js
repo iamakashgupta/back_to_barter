@@ -6,24 +6,15 @@ const Market = () => {
   useEffect(() => {
     // Fetch market items from backend (placeholder here)
     const fetchItems = async () => {
-      // You'd replace this with your real backend call
-      setItems([
-        {
-          _id: "1",
-          title: "Used Books",
-          description: "5 NCERTs in good condition",
-          weight: 4,
-          image: "https://picsum.photos/seed/book/300/200"
-        },
-        {
-          _id: "2",
-          title: "Spare Kitchen Utensils",
-          description: "Used for only 2 months",
-          weight: 3,
-          image: "https://picsum.photos/seed/kitchen/300/200"
+        try {
+          const res = await fetch("http://localhost:5000/api/products");
+          const data = await res.json();
+          setItems(data);
+        } catch (err) {
+          console.error("Error fetching products:", err);
         }
-      ]);
-    };
+      };
+      
     fetchItems();
   }, []);
 
