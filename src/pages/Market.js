@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Market = () => {
   const [products, setProducts] = useState([]);
+  const [claimedIds, setClaimedIds] = useState([]);
+
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
@@ -21,25 +23,23 @@ const Market = () => {
     fetchProducts();
   }, []);
 
-  const handleClaim = async (productId) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const userId = user ? user._id : null;
-
-      if (!userId) {
-        alert("Please login to claim items.");
-        navigate("/login");
-        return;
-      }
-
-      await axios.put(`http://localhost:5000/api/items/claim/${productId}`, { userId });
-
-      alert("Claimed successfully! ✅");
-      fetchProducts(); // Refresh the list
-    } catch (err) {
-      console.error("Error claiming item:", err.response?.data || err.message);
-      alert(`Failed to claim item ❌: ${err.response?.data?.message || 'Unknown error'}`);
+  const handleClaim = (productId) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("Please login to claim items.");
+      navigate("/login");
+      return;
     }
+  
+    // Hide item visually
+    setClaimedIds(prev => [...prev, productId]);
+  
+    // 🌿 Update ecoScore in localStorage
+    const currentScore = parseInt(localStorage.getItem('ecoScore')) || 0;
+    const newScore = Math.min(currentScore + 10, 100); // ⬆️ add 10 points
+    localStorage.setItem('ecoScore', newScore);
+  
+    alert("Claimed & Ecometer boosted ✅");
   };
   
 
@@ -47,23 +47,22 @@ const Market = () => {
     <div className="market-container">
       <h2>Community Market 🛍️</h2>
       <div className="product-grid">
-        {products
-          .filter(product => !product.claimed) // 🧽 Only show unclaimed items
-          .map(product => (
-            <div key={product._id} className="product-card">
-              <img src={product.image || "https://via.placeholder.com/150"} alt={product.title} />
-              <h3>{product.title}</h3>
-              <p>{product.description}</p>
-              <p><strong>Weight:</strong> {product.weight}</p>
-              {!product.claimedBy ? (
-                <button onClick={() => handleClaim(product._id)}>Claim</button>
-                ) : (
-                <button disabled>Already Claimed</button>
-                )}
-
-            </div>
-          ))}
+  {products
+    .filter(product => !product.claimed && !claimedIds.includes(product._id)) // ✅ updated
+    .map(product => (
+      <div key={product._id} className="product-card">
+        <img src={product.image || "https://via.placeholder.com/150"} alt={product.title} />
+        <h3>{product.title}</h3>
+        <p>{product.description}</p>
+        <p><strong>Weight:</strong> {product.weight}</p>
+        {!product.claimedBy ? (
+          <button onClick={() => handleClaim(product._id)}>Claim</button>
+        ) : (
+          <button disabled>Already Claimed</button>
+        )}
       </div>
+    ))}
+</div>
     </div>
   );
 };
