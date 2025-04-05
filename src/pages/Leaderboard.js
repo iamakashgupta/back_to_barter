@@ -1,57 +1,34 @@
-// frontend/src/pages/Leaderboard.js
-import React, { useEffect, useState } from "react";
-import API from "../api";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Leaderboard = () => {
-  const [users, setUsers] = useState([]);
-
-  const fetchLeaderboard = async () => {
-    try {
-      const res = await API.get("/leaderboard");
-      setUsers(res.data);
-    } catch (err) {
-      console.error("Failed to fetch leaderboard", err);
-    }
-  };
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/leaderboard');
+        setLeaderboard(res.data);
+      } catch (err) {
+        console.error('Error fetching leaderboard:', err);
+      }
+    };
+
     fetchLeaderboard();
   }, []);
 
   return (
-    <div style={styles.container}>
-      <h2>🏆 Top Donators</h2>
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Items Donated</th>
-            <th>BarterCoins</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u, i) => (
-            <tr key={u._id}>
-              <td>{i + 1}</td>
-              <td>{u.name}</td>
-              <td>{u.donatedItems}</td>
-              <td>{u.barterCoins}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <h2>Leaderboard</h2>
+      <ul>
+        {leaderboard.map((user, index) => (
+          <li key={index}>
+            {user.username}: {user.claimedItems} items claimed
+          </li>
+        ))}
+      </ul>
     </div>
   );
-};
-
-const styles = {
-  container: { padding: "20px" },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  th: { backgroundColor: "#ddd" }
 };
 
 export default Leaderboard;

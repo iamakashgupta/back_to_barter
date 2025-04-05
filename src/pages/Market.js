@@ -25,15 +25,15 @@ const Market = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user ? user._id : null;
-  
+
       if (!userId) {
         alert("Please login to claim items.");
         navigate("/login");
         return;
       }
-  
-      const res = await axios.put(`http://localhost:5000/api/items/claim/${productId}`, { userId });
-  
+
+      await axios.put(`http://localhost:5000/api/items/claim/${productId}`, { userId });
+
       alert("Claimed successfully! ✅");
       fetchProducts(); // Refresh the list
     } catch (err) {
